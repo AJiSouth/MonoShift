@@ -1,0 +1,33 @@
+# Unity generated files
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# Visual Studio / VS Code generated files
+.vs/
+.vsconfig
+*.csproj
+*.unityproj
+*.sln
+*.userprefs
+*.suo
+*.pidb
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Compression / Package files
+*.apk
+*.aab
+*.unitypackage
+*.7z
+*.rar
+*.zip
