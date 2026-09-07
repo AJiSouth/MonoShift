@@ -31,6 +31,10 @@ public class GridManager : MonoBehaviour
 
     private bool isProcessing = false;
 
+    // ---- 步数系统 ----
+    public int stepCount = 0;
+    public System.Action<int> OnStepChanged;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -79,6 +83,10 @@ public class GridManager : MonoBehaviour
         }
 
         triggeredGoals.Clear();
+
+        // 初始化步数
+        stepCount = 0;
+        OnStepChanged?.Invoke(stepCount);
     }
 
     // ---- 生成箱子 ----
@@ -128,7 +136,7 @@ public class GridManager : MonoBehaviour
         buttonObjects[gridPos] = btnObj;
     }
 
-    // ---- 生成目标点----
+    // ---- 生成目标点 ----
     private void SpawnGoalPoint(Vector2Int gridPos)
     {
         GameObject goalPrefab = Resources.Load<GameObject>("Goal/GoalPoint");
@@ -298,12 +306,16 @@ public class GridManager : MonoBehaviour
         CheckGoalPoint(box);
     }
 
-    // ---- 移动玩家 ----
+    // ---- 移动玩家（同时增加步数） ----
     private void MovePlayerTo(Vector2Int newPos)
     {
         PlayerGridPos = newPos;
         Vector3 worldPos = new Vector3(newPos.x + 0.5f, newPos.y + 0.5f, -1);
         playerTransform.position = worldPos;
+
+        // 增加步数
+        stepCount++;
+        OnStepChanged?.Invoke(stepCount);
     }
 
     // ---- 取反颜色 ----
@@ -346,7 +358,6 @@ public class GridManager : MonoBehaviour
         if (HasButton(posB))
         {
             CheckAndDyeBox(newBox);
-            // 融合后如果有按钮，停留
             Debug.Log("融合在按钮上，染色停留");
         }
 
@@ -410,13 +421,25 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    // ---- 目标点事件 ----
+    // ---- 目标点事件（触发胜利弹窗） ----
     private void OnGoalReached(Vector2Int goalPos)
     {
         Debug.Log($"目标点 {goalPos} 已激活！");
+        // 记录通关
+        LevelManager.CompleteLevel();
+        // 显示胜利弹窗
+        GameUI gameUI = FindObjectOfType<GameUI>();
+        if (gameUI != null)
+        {
+            gameUI.ShowWinPanel();
+        }
+        else
+        {
+            Debug.LogWarning("未找到 GameUI，无法显示胜利弹窗");
+        }
     }
 
-    // ---- 重置关卡 ----
+    // ---- 重置关卡（同时重置步数） ----
     public void ResetLevel()
     {
         if (currentLevelData == null) return;
@@ -448,6 +471,10 @@ public class GridManager : MonoBehaviour
         foreach (Vector2Int goalPos in currentLevelData.goalPoints)
             SpawnGoalPoint(goalPos);
 
+        // 重置步数
+        stepCount = 0;
+        OnStepChanged?.Invoke(0);
+
         Debug.Log("关卡已重置");
     }
 
@@ -455,6 +482,6 @@ public class GridManager : MonoBehaviour
     public void QuitLevel()
     {
         Debug.Log("退出关卡");
-        // SceneManager.LoadScene("MainMenu");
+        LevelManager.GoToMainMenu();
     }
 }

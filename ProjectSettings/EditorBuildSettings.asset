@@ -6,6 +6,24 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.scene
+    path: Assets/Scenes/MainMenu.scene
+    guid: 31fc94cd610e6f1439c47dccfe015d15
+  - enabled: 1
+    path: Assets/Scenes/LevelSelect.scene
+    guid: e51474b7fb385ca4e98d8244e8845773
+  - enabled: 1
+    path: Assets/Scenes/GameScene.scene
     guid: 2cda990e2423bbf4892e6590ba056729
+  m_BuildProfiles: []
   m_configObjects: {}
+  m_SlimFeaturesWeixinMiniGame:
+    ACLDecompression: 0
+    AllocateOverhead: 1
+    DecompressASTC: 0
+    DecompressDXT: 0
+    DecompressETC: 1
+    FreeTypeSfntPng: 1
+    JobWorker: 2
+    LightProbe: 2
+    RootMotion: 0
+    UseStringInternPool: 2
