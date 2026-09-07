@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.SceneManagement;
 
 public class GridManager : MonoBehaviour
 {
@@ -23,6 +24,10 @@ public class GridManager : MonoBehaviour
     // 按钮系统
     private Dictionary<Vector2Int, BoxColor> buttonDict = new Dictionary<Vector2Int, BoxColor>();
     private Dictionary<Vector2Int, GameObject> buttonObjects = new Dictionary<Vector2Int, GameObject>();
+
+    // 目标点系统
+    private Dictionary<Vector2Int, GameObject> goalObjects = new Dictionary<Vector2Int, GameObject>();
+    private HashSet<Vector2Int> triggeredGoals = new HashSet<Vector2Int>();
 
     private bool isProcessing = false;
 
@@ -66,6 +71,14 @@ public class GridManager : MonoBehaviour
         {
             SpawnButton(info.gridPos, info.color);
         }
+
+        // ---- 生成目标点 ----
+        foreach (Vector2Int goalPos in currentLevelData.goalPoints)
+        {
+            SpawnGoalPoint(goalPos);
+        }
+
+        triggeredGoals.Clear();
     }
 
     // ---- 生成箱子 ----
@@ -95,7 +108,6 @@ public class GridManager : MonoBehaviour
         }
 
         box.gridPos = gridPos;
-        // 确保颜色与预制体一致
         boxDict[gridPos] = box;
     }
 
@@ -116,27 +128,48 @@ public class GridManager : MonoBehaviour
         buttonObjects[gridPos] = btnObj;
     }
 
-    // ---- 按钮染色，生成新箱子 ----
+    // ---- 生成目标点----
+    private void SpawnGoalPoint(Vector2Int gridPos)
+    {
+        GameObject goalPrefab = Resources.Load<GameObject>("Goal/GoalPoint");
+        if (goalPrefab == null)
+        {
+            Debug.LogError("未找到目标点预制体，请放在 Resources/Goal/GoalPoint");
+            return;
+        }
+
+        Vector3 worldPos = new Vector3(gridPos.x + 0.5f, gridPos.y + 0.5f, -0.8f);
+        GameObject goalObj = Instantiate(goalPrefab, worldPos, Quaternion.identity);
+        goalObjects[gridPos] = goalObj;
+        // 初始为灰色（未激活）
+        SpriteRenderer sr = goalObj.GetComponent<SpriteRenderer>();
+        if (sr != null) sr.color = Color.gray;
+    }
+
+    // ---- 按钮染色，返回新箱子 ----
     private Box CheckAndDyeBox(Box box)
     {
-        if (isProcessing) return box; // 动画期间不染色
+        if (isProcessing) return box;
 
         if (buttonDict.TryGetValue(box.gridPos, out BoxColor buttonColor))
         {
             if (box.color != buttonColor)
             {
                 Vector2Int pos = box.gridPos;
-                // 从字典移除旧箱子
                 boxDict.Remove(pos);
                 Destroy(box.gameObject);
-                // 生成新颜色的箱子
                 SpawnBox(pos, buttonColor);
                 Debug.Log($"箱子在按钮上，销毁并重新生成，颜色变为 {buttonColor}");
-                // 返回新箱子引用
                 return boxDict[pos];
             }
         }
-        return box; // 未染色，返回原箱子
+        return box;
+    }
+
+    // ---- 检测格子是否有按钮 ----
+    private bool HasButton(Vector2Int pos)
+    {
+        return buttonDict.ContainsKey(pos);
     }
 
     // ---- 检测格子地板颜色 ----
@@ -181,7 +214,7 @@ public class GridManager : MonoBehaviour
         MovePlayerTo(targetPos);
     }
 
-    // ---- 推动箱子---
+    // ---- 推动箱子 ----
     private void TryPushBox(Box box, Vector2Int direction)
     {
         Vector2Int pushTarget = box.gridPos + direction;
@@ -221,32 +254,38 @@ public class GridManager : MonoBehaviour
         // 1. 箱子先移动到目标格（瞬间）
         MoveBoxTo(box, pushTarget);
 
-        // 2. 检查目标格是否有按钮
-        if (buttonDict.ContainsKey(pushTarget))
+        // 2. 检查是否有按钮，如果有则染色并直接停留
+        bool hasButton = HasButton(pushTarget);
+        if (hasButton)
         {
-            // 有按钮 → 强制染色，并停留在目标格
-            Box currentBox = CheckAndDyeBox(box); // 可能重建
-            MovePlayerTo(boxOriginalPos); // 玩家移到箱子原位置
-            Debug.Log("箱子被推上按钮，染色后停留");
-            return; // 结束，不执行后续滑回判断
-        }
-
-        // 3. 没有按钮 → 根据地板颜色决定是否滑回
-        bool colorMatch = (box.color == BoxColor.Black && floorColor == BoxColor.Black) ||
-                          (box.color == BoxColor.White && floorColor == BoxColor.White);
-        if (colorMatch)
-        {
+            // 染色
+            Box currentBox = CheckAndDyeBox(box);
+            // 直接停留，玩家移到箱子原位置
             MovePlayerTo(boxOriginalPos);
-            Debug.Log("推动成功，箱子停留在目标格");
+            Debug.Log("箱子推到按钮上，染色后停留");
+            // 不需要检测地板，即使不匹配也不滑回
         }
         else
         {
-            StartCoroutine(SlideBoxBack(box, boxOriginalPos, pushTarget));
-            Debug.Log("颜色不匹配，箱子滑回，玩家不动");
+            // 没有按钮，检测地板颜色匹配
+            bool colorMatch = (box.color == BoxColor.Black && floorColor == BoxColor.Black) ||
+                              (box.color == BoxColor.White && floorColor == BoxColor.White);
+            if (colorMatch)
+            {
+                // 匹配，停留，玩家前进
+                MovePlayerTo(boxOriginalPos);
+                Debug.Log("推动成功，箱子停留在目标格");
+            }
+            else
+            {
+                // 不匹配，触发滑回
+                StartCoroutine(SlideBoxBack(box, boxOriginalPos, pushTarget));
+                Debug.Log("颜色不匹配，箱子滑回，玩家不动");
+            }
         }
     }
 
-    // ---- 移动箱子 ----
+    // ---- 移动箱子（瞬间） ----
     private void MoveBoxTo(Box box, Vector2Int newPos)
     {
         boxDict.Remove(box.gridPos);
@@ -254,6 +293,9 @@ public class GridManager : MonoBehaviour
         boxDict[newPos] = box;
         Vector3 worldPos = new Vector3(newPos.x + 0.5f, newPos.y + 0.5f, -1);
         box.transform.position = worldPos;
+
+        // 检测目标点（箱子移动后）
+        CheckGoalPoint(box);
     }
 
     // ---- 移动玩家 ----
@@ -301,7 +343,15 @@ public class GridManager : MonoBehaviour
         newBox.transform.localScale = originalScale;
 
         // 融合后检测按钮
-        CheckAndDyeBox(newBox);
+        if (HasButton(posB))
+        {
+            CheckAndDyeBox(newBox);
+            // 融合后如果有按钮，停留
+            Debug.Log("融合在按钮上，染色停留");
+        }
+
+        // 检测目标点
+        CheckGoalPoint(newBox);
 
         isProcessing = false;
         Debug.Log("融合完成！");
@@ -336,6 +386,36 @@ public class GridManager : MonoBehaviour
         Debug.Log("滑回完成");
     }
 
+    // ---- 目标点检测 ----
+    private void CheckGoalPoint(Box box)
+    {
+        Debug.Log($"CheckGoalPoint 被调用，箱子位置: {box.gridPos}，目标点列表: {string.Join(", ", currentLevelData.goalPoints)}");
+        if (currentLevelData == null) return;
+
+        foreach (Vector2Int goalPos in currentLevelData.goalPoints)
+        {
+            if (box.gridPos == goalPos && !triggeredGoals.Contains(goalPos))
+            {
+                triggeredGoals.Add(goalPos);
+                // 激活目标点视觉效果
+                if (goalObjects.TryGetValue(goalPos, out GameObject goalObj))
+                {
+                    SpriteRenderer sr = goalObj.GetComponent<SpriteRenderer>();
+                    if (sr != null) sr.color = Color.green;
+                }
+                Debug.Log($"箱子到达目标点 {goalPos}！触发事件！");
+                OnGoalReached(goalPos);
+                break;
+            }
+        }
+    }
+
+    // ---- 目标点事件 ----
+    private void OnGoalReached(Vector2Int goalPos)
+    {
+        Debug.Log($"目标点 {goalPos} 已激活！");
+    }
+
     // ---- 重置关卡 ----
     public void ResetLevel()
     {
@@ -350,6 +430,12 @@ public class GridManager : MonoBehaviour
         buttonDict.Clear();
         buttonObjects.Clear();
 
+        // 清除目标点
+        foreach (var kvp in goalObjects)
+            Destroy(kvp.Value.gameObject);
+        goalObjects.Clear();
+        triggeredGoals.Clear();
+
         PlayerGridPos = currentLevelData.playerStart;
         playerTransform.position = new Vector3(PlayerGridPos.x + 0.5f, PlayerGridPos.y + 0.5f, -1);
 
@@ -358,5 +444,17 @@ public class GridManager : MonoBehaviour
 
         foreach (var info in currentLevelData.buttonList)
             SpawnButton(info.gridPos, info.color);
+
+        foreach (Vector2Int goalPos in currentLevelData.goalPoints)
+            SpawnGoalPoint(goalPos);
+
+        Debug.Log("关卡已重置");
+    }
+
+    // ---- 退出关卡 ----
+    public void QuitLevel()
+    {
+        Debug.Log("退出关卡");
+        // SceneManager.LoadScene("MainMenu");
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 public class LevelData : ScriptableObject
 {
     [Header("网格尺寸")]
-    public Vector2Int gridSize = new Vector2Int(8, 5);
+    public Vector2Int gridSize = new Vector2Int(12, 6);
 
     [Header("玩家出生位置")]
     public Vector2Int playerStart = new Vector2Int(0, 2);
@@ -15,6 +15,9 @@ public class LevelData : ScriptableObject
 
     [Header("按钮列表")]
     public List<ButtonSpawnInfo> buttonList = new List<ButtonSpawnInfo>();
+
+    [Header("目标点列表（箱子到达即触发事件）")]
+    public List<Vector2Int> goalPoints = new List<Vector2Int>();
 }
 
 [System.Serializable]
@@ -28,5 +31,5 @@ public class BoxSpawnInfo
 public class ButtonSpawnInfo
 {
     public Vector2Int gridPos;
-    public BoxColor color;   // 按钮颜色
+    public BoxColor color;
 }
