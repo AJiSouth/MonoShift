@@ -16,8 +16,11 @@ public class LevelData : ScriptableObject
     [Header("按钮列表")]
     public List<ButtonSpawnInfo> buttonList = new List<ButtonSpawnInfo>();
 
-    [Header("目标点列表（箱子到达即触发事件）")]
+    [Header("目标点列表")]
     public List<Vector2Int> goalPoints = new List<Vector2Int>();
+
+    [Header("关卡按钮图片")]
+    public Sprite levelImage;
 }
 
 [System.Serializable]
