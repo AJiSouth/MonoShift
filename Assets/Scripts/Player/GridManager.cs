@@ -207,18 +207,29 @@ public class GridManager : MonoBehaviour
 
         Vector2Int targetPos = PlayerGridPos + direction;
 
+        // 边界检查
         if (targetPos.x < 0 || targetPos.x >= gridSize.x || targetPos.y < 0 || targetPos.y >= gridSize.y)
         {
             Debug.Log("边界外，无法移动");
             return;
         }
 
+        // 地板检查
+        BoxColor? floorColor = GetFloorColor(targetPos);
+        if (floorColor == null)
+        {
+            Debug.Log("目标格无地板，无法移动");
+            return;
+        }
+
+        // 箱子检查
         if (boxDict.TryGetValue(targetPos, out Box targetBox))
         {
             TryPushBox(targetBox, direction);
             return;
         }
 
+        // 空地移动
         MovePlayerTo(targetPos);
     }
 

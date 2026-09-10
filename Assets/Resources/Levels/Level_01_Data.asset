@@ -21,15 +21,9 @@ MonoBehaviour:
     color: 1
   - gridPos: {x: 10, y: 1}
     color: 1
-  - gridPos: {x: 9, y: 3}
-    color: 1
-  - gridPos: {x: 1, y: 3}
-    color: 0
   buttonList:
   - gridPos: {x: 3, y: 3}
     color: 1
-  - gridPos: {x: 10, y: 3}
-    color: 0
   goalPoints:
   - {x: 10, y: 0}
   levelImage: {fileID: 21300000, guid: ad5d788a838a6cf4cb72ebc66d473d1c, type: 3}

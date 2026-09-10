@@ -27,7 +27,7 @@ public class GameUI : MonoBehaviour
 
     void UpdateStepUI(int steps)
     {
-        stepText.text = $"²½Êý£º{steps}";
+        stepText.text = steps.ToString();
     }
 
     public void ShowWinPanel()
