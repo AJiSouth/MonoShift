@@ -35,6 +35,9 @@ public class GridManager : MonoBehaviour
     public int stepCount = 0;
     public System.Action<int> OnStepChanged;
 
+    // ---- BGM ----
+    public AudioClip gameBGM;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -90,6 +93,10 @@ public class GridManager : MonoBehaviour
         // 初始化步数
         stepCount = 0;
         OnStepChanged?.Invoke(stepCount);
+
+        // ---- 播放BGM ----
+        if (AudioManager.Instance != null && gameBGM != null)
+            AudioManager.Instance.PlayBGM(gameBGM);
     }
 
     // ---- 生成箱子 ----
