@@ -5,15 +5,23 @@ public class MainMenuUI : MonoBehaviour
 {
     public Button startButton;
     public Button quitButton;
+    public Button settingButton;
+    public SettingPanel settingPanel;
 
     [Header("BGM")]
     public AudioClip mainMenuBGM;
 
     void Start()
     {
-        startButton.onClick.AddListener(OnStartClicked);
-        quitButton.onClick.AddListener(OnQuitClicked);
-        //bgm
+        if (startButton != null)
+            startButton.onClick.AddListener(OnStartClicked);
+
+        if (quitButton != null)
+            quitButton.onClick.AddListener(OnQuitClicked);
+
+        if (settingButton != null)
+            settingButton.onClick.AddListener(OnSettingClicked);
+
         if (AudioManager.Instance != null && mainMenuBGM != null)
             AudioManager.Instance.PlayBGM(mainMenuBGM);
     }
@@ -29,5 +37,11 @@ public class MainMenuUI : MonoBehaviour
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #endif
+    }
+
+    void OnSettingClicked()
+    {
+        if (settingPanel != null)
+            settingPanel.Open();
     }
 }

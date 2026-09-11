@@ -577,7 +577,7 @@ MonoBehaviour:
   tilemapBlack: {fileID: 785806635}
   tilemapWhite: {fileID: 1069321988}
   stepCount: 0
-  gameBGM: {fileID: 8300000, guid: 5b17ab98eb29bf7498af1bf7de123957, type: 3}
+  gameBGM: {fileID: 8300000, guid: ef11a1b2603571f42963ef16404107ed, type: 3}
 --- !u!4 &213891787
 Transform:
   m_ObjectHideFlags: 0

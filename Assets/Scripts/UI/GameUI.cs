@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameUI : MonoBehaviour
 {
@@ -8,6 +9,8 @@ public class GameUI : MonoBehaviour
     public GameObject winPanel;
     public Button nextLevelButton;
     public Button winMenuButton;
+    public Button settingButton;      // ← 新增
+    public SettingPanel settingPanel; // ← 新增
 
     private GridManager gridManager;
 
@@ -20,31 +23,23 @@ public class GameUI : MonoBehaviour
             UpdateStepUI(gridManager.stepCount);
         }
 
-        winPanel.SetActive(false);
-        nextLevelButton.onClick.AddListener(OnNextLevel);
-        winMenuButton.onClick.AddListener(OnMainMenu);
+        if (winPanel != null) winPanel.SetActive(false);
+        if (nextLevelButton != null) nextLevelButton.onClick.AddListener(OnNextLevel);
+        if (winMenuButton != null) winMenuButton.onClick.AddListener(OnMainMenu);
+        if (settingButton != null) settingButton.onClick.AddListener(OnSettingClicked);
     }
 
     void UpdateStepUI(int steps)
     {
-        stepText.text = steps.ToString();
+        if (stepText != null)
+            stepText.text = steps.ToString();
     }
 
     public void ShowWinPanel()
     {
-        winPanel.SetActive(true);
-        // 检查是否最后一关
-        int nextIndex = LevelManager.currentLevelIndex + 1;
-        bool hasNext = nextIndex < LevelManager.allLevels.Length;
-        nextLevelButton.gameObject.SetActive(hasNext);
-        if (!hasNext)
-        {
-            // 如果是最后一关，可以改文字提示
-            Text btnText = nextLevelButton.GetComponentInChildren<Text>();
-            if (btnText != null) btnText.text = "已通关";
-            nextLevelButton.interactable = false;
-        }
-        // 记录通关
+        if (winPanel != null)
+            winPanel.SetActive(true);
+
         LevelManager.CompleteLevel();
     }
 
@@ -57,6 +52,12 @@ public class GameUI : MonoBehaviour
     void OnMainMenu()
     {
         LevelManager.GoToMainMenu();
+    }
+
+    void OnSettingClicked()
+    {
+        if (settingPanel != null)
+            settingPanel.Open();
     }
 
     void OnDestroy()

@@ -1669,6 +1669,8 @@ MonoBehaviour:
   winPanel: {fileID: 1864481911}
   nextLevelButton: {fileID: 1663345562}
   winMenuButton: {fileID: 358671498}
+  settingButton: {fileID: 0}
+  settingPanel: {fileID: 0}
 --- !u!4 &1259170112
 Transform:
   m_ObjectHideFlags: 0
@@ -2464,7 +2466,7 @@ MonoBehaviour:
   tilemapBlack: {fileID: 1237826498}
   tilemapWhite: {fileID: 887421120}
   stepCount: 0
-  gameBGM: {fileID: 8300000, guid: 5b17ab98eb29bf7498af1bf7de123957, type: 3}
+  gameBGM: {fileID: 8300000, guid: ef11a1b2603571f42963ef16404107ed, type: 3}
 --- !u!4 &1955380235
 Transform:
   m_ObjectHideFlags: 0
