@@ -685,7 +685,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelData: {fileID: 11400000, guid: 774b86fd4e7fcb04e89dbc1393e2c14a, type: 2}
-  levelIndex: 0
+  levelIndex: 1
 --- !u!114 &1105154696
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1202,7 +1202,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelData: {fileID: 11400000, guid: 22884aa30ea5bc04f99c3e1217f1aab5, type: 2}
-  levelIndex: 0
+  levelIndex: 2
 --- !u!95 &2143811108
 Animator:
   serializedVersion: 6

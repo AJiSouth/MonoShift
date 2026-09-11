@@ -12,9 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd863b323d33c8b4b96a8995867313a6, type: 3}
   m_Name: Level_02_Data
   m_EditorClassIdentifier: 
-  gridSize: {x: 12, y: 6}
+  gridSize: {x: 12, y: 10}
   playerStart: {x: 0, y: 2}
-  boxSpawnList: []
-  buttonList: []
-  goalPoints: []
+  boxSpawnList:
+  - gridPos: {x: 4, y: 3}
+    color: 1
+  - gridPos: {x: 10, y: 5}
+    color: 1
+  - gridPos: {x: 10, y: 7}
+    color: 0
+  buttonList:
+  - gridPos: {x: 5, y: 3}
+    color: 1
+  - gridPos: {x: 10, y: 4}
+    color: 0
+  goalPoints:
+  - {x: 10, y: 9}
   levelImage: {fileID: 0}

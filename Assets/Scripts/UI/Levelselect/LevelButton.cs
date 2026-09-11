@@ -21,7 +21,9 @@ public class LevelButton : MonoBehaviour
             return;
         }
 
-        // 设置关卡图片（如果 levelData 有 levelImage）
+        btn.transition = Selectable.Transition.None;
+
+        // 设置关卡图片
         if (img != null && levelData != null && levelData.levelImage != null)
         {
             img.sprite = levelData.levelImage;
@@ -38,7 +40,7 @@ public class LevelButton : MonoBehaviour
         {
             // 未解锁：变灰
             if (img != null)
-                img.color = new Color(0.4f, 0.4f, 0.4f, 0.7f);
+                img.color = new Color(0.6f, 0.6f, 0.6f, 1f);
         }
         else
         {
@@ -52,7 +54,7 @@ public class LevelButton : MonoBehaviour
         bool isUnlocked = (levelIndex <= LevelManager.UnlockedLevel);
         btn.interactable = isUnlocked;
         if (!isUnlocked && img != null)
-            img.color = new Color(0.4f, 0.4f, 0.4f, 0.7f);
+            img.color = new Color(0.6f, 0.6f, 0.6f, 1f);
         else if (img != null)
             img.color = Color.white;
     }

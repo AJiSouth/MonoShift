@@ -43,6 +43,9 @@ public class GridManager : MonoBehaviour
 
     private void Start()
     {
+        // 识别当前关卡索引
+        LevelManager.SetCurrentIndexBySceneName(gameObject.scene.name);
+
         if (currentLevelData == null)
         {
             Debug.LogError("未设置关卡数据！");

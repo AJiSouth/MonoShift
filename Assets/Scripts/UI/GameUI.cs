@@ -50,6 +50,7 @@ public class GameUI : MonoBehaviour
 
     void OnNextLevel()
     {
+        //UnityEngine.SceneManagement.SceneManager.LoadScene("GameScene02");
         LevelManager.LoadNextLevel();
     }
 
